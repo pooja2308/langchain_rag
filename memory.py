@@ -1,5 +1,8 @@
 import redis
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+import os
+
+r = redis.Redis(host="redis" if os.getenv("PROFILE") == "docker" else "localhost", port=6379, decode_responses=True)
+
 
 def _key(user: str) -> str:
     return f"memory:{user}"
@@ -11,6 +14,7 @@ def save_memory(user: str, message: str) -> None:
     except redis.exceptions.ConnectionError:
         # Allow app to run without Redis (memory becomes ephemeral).
         return
+
 
 def get_memory(user: str):
     try:
